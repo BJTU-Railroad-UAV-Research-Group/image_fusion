@@ -1,0 +1,22 @@
+samples_path: "AugSamples" # 抠图样本路径，默认存放抠图样本及其增强版本的文件夹名称,不要更改！！！
+output_path: "output" # 生成样本路径，默认存放增强样本的文件夹名称，不要更改！！！
+ori_img_path: "images" # 原图路径，默认存放原图的文件夹名称
+
+
+train_aug_pairs_name: "train_aug_pairs.csv" # 训练集增强样本对列表，默认训练集增强样本对列表名称
+val_aug_pairs_name: "val_aug_pairs.csv" # 测试集增强样本对列表，默认测试集增强样本对列表名称
+
+train_fusion_image_nums: 2 # 要生成的融合图像的数量
+sample_min_nums_at_one_image: 1 # 选择要融入原始图像的抠图样本数量，不要设置过大，1或2即可，会自动进行选定抠图样本的随机增强
+
+fusion_type: "mask" # 融合类型，默认为"default". 可选内容包括"default", "mask".
+# defeault即在图像中随机融合保证不与既有目标框相交；
+# mask则在遵循default基础上，给出图像中mask区域，保证抠图样本在图像mask区域中融合，注意：mask图生成请使用mask_extract.py
+
+train_ratio: 0.7 # 训练集比例，默认0.7
+rotation_prob: 0.5 # 旋转概率，默认0.5
+up_prob: 0.5 # 放大概率，默认0.5
+down_prob: 0.5 # 缩小概率，默认0.5
+light_prob: 0.5 # 亮度概率，默认0.5
+
+seed: 42 # 随机种子，默认42
