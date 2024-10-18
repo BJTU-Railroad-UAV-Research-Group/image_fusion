@@ -4,7 +4,9 @@ import yaml
 import os
 import shutil
 
-from utils.utils import get_bounding_boxes_from_labelme, count_images_with_substring, write_image_info_to_csv
+from tqdm import tqdm
+
+from utils.utils import count_images_with_substring, write_image_info_to_csv
 from utils.fusion import choose_images_match_samples, paste_samples_on_image
 from utils.dataset import split_raw_image_dataset, extract_unique_samples
 
@@ -33,7 +35,9 @@ def process(config):
     val_aug_pairs = choose_images_match_samples(val_files, val_samples, config, mode="val")
     write_image_info_to_csv(image_info_list=val_aug_pairs, output_csv=os.path.join(Augmented_path, config["val_aug_pairs_name"]))
     
-    for _, match_pair in enumerate(train_aug_pairs):
+    print("Start to fuse train images...")
+    
+    for match_pair in tqdm(train_aug_pairs, desc="train fusion processing", unit="task"):
         
         train_image_file, sample_files = match_pair.popitem()
 
@@ -43,23 +47,25 @@ def process(config):
         fused_label_name = fused_image_name.split(".")[0]+".json"
         
         train_image_path = os.path.join(config["ori_img_path"], train_image_file)
-        train_label_path = os.path.join(config["ori_img_path"], train_image_file.split(".")[0]+".json")
         sample_images_path = [os.path.join(config["samples_path"], sample_file.split("_")[0], sample_file) for sample_file in sample_files]
-
-        bounding_boxes = get_bounding_boxes_from_labelme(train_label_path)
     
-        fused_image, fused_label = paste_samples_on_image(image_path=train_image_path, bounding_boxes=bounding_boxes, sample_images_path=sample_images_path, config=config)
+        fused_image, fused_label = paste_samples_on_image(image_path=train_image_path, sample_images_path=sample_images_path)
         fused_label["imagePath"] = fused_image_name
         
+        # 过滤掉类别为__mask__的目标
+        fused_label["shapes"] = [shape for shape in fused_label['shapes'] if shape['label'] != '__mask__']
+        
         cv2.imencode('.jpg', fused_image)[1].tofile(os.path.join(Augmented_path, "train", fused_image_name))
-        print(f"Train File: Saved {fused_image_name} to {Augmented_path}")
+        # print(f"Train File: Saved {fused_image_name} to {Augmented_path}")
         
         with open(os.path.join(Augmented_path, "train", fused_label_name), 'w', encoding="utf-8") as json_file:
             json.dump(fused_label, json_file, indent=4)  # 直接写入数据
             json_file.close()
-        print(f"Train File: Saved {fused_label_name} to {Augmented_path}")
+        # print(f"Train File: Saved {fused_label_name} to {Augmented_path}")
     
-    for _, match_pair in enumerate(val_aug_pairs):
+    print("Start to fuse val images...")
+    
+    for match_pair in tqdm(val_aug_pairs, desc="val fusion processing", unit="task"):
 
         val_image_file, sample_files = match_pair.popitem()
 
@@ -69,22 +75,21 @@ def process(config):
         fused_label_name = fused_image_name.split(".")[0]+".json"
 
         val_image_path = os.path.join(config["ori_img_path"], val_image_file)
-        val_label_path = os.path.join(config["ori_img_path"], val_image_file.split(".")[0]+".json")
         sample_images_path = [os.path.join(config["samples_path"], sample_file.split("_")[0], sample_file) for sample_file in sample_files]
-        
-        bounding_boxes = get_bounding_boxes_from_labelme(val_label_path)
 
-        fused_image, fused_label = paste_samples_on_image(image_path=val_image_path, bounding_boxes=bounding_boxes, sample_images_path=sample_images_path, config=config)
+        fused_image, fused_label = paste_samples_on_image(image_path=val_image_path,sample_images_path=sample_images_path, config=config)
         fused_label["imagePath"] = fused_image_name
         
+        # 过滤掉类别为__mask__的目标
+        fused_label["shapes"] = [shape for shape in fused_label['shapes'] if shape['label'] != '__mask__']
+        
         cv2.imencode('.jpg', fused_image)[1].tofile(os.path.join(Augmented_path, "val", fused_image_name))
-        print(f"Val File: Saved {fused_image_name} to {Augmented_path}")
+        # print(f"Val File: Saved {fused_image_name} to {Augmented_path}")
         
         with open(os.path.join(Augmented_path, "val", fused_label_name), 'w', encoding="utf-8") as json_file:
             json.dump(fused_label, json_file, indent=4)
             json_file.close()
-        print(f"Val File: Saved {fused_label_name} to {Augmented_path}")
-    
+        # print(f"Val File: Saved {fused_label_name} to {Augmented_path}")
     
     for train_file in train_files:
         shutil.copy(os.path.join(config["ori_img_path"], train_file), os.path.join(FilteredLabeled_path, "train", train_file))

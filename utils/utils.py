@@ -4,40 +4,6 @@ from typing import List, Tuple, Dict
 
 import csv
 
-def get_bounding_boxes_from_labelme(labelme_file_path: str) -> List[Tuple[int, int, int, int]]:
-    """
-    读取 Labelme 标注文件，获取所有目标的最小外接矩形检测框的坐标信息。
-
-    :param labelme_file_path: Labelme 标注文件的路径
-    :return: 返回一个包含所有检测框坐标的列表，格式为 [(xmin, ymin, xmax, ymax), ...]
-    """
-    bounding_boxes = []
-
-    # 读取 Labelme 标注文件
-    with open(labelme_file_path, 'r') as f:
-        data = json.load(f)
-
-    # 遍历所有形状对象，提取多边形标注并计算外接矩形
-    for shape in data['shapes']:
-        # 只处理标注类型为多边形的目标
-        if shape['shape_type'] == 'polygon':
-            points = shape['points']  # 获取多边形的点坐标
-
-            # 提取所有点的 x 和 y 坐标
-            x_coords = [point[0] for point in points]
-            y_coords = [point[1] for point in points]
-
-            # 计算最小外接矩形的坐标 (xmin, ymin, xmax, ymax)
-            xmin = int(min(x_coords))
-            ymin = int(min(y_coords))
-            xmax = int(max(x_coords))
-            ymax = int(max(y_coords))
-
-            # 将外接矩形的坐标添加到列表中
-            bounding_boxes.append((xmin, ymin, xmax, ymax))
-
-    return bounding_boxes
-
 def count_images_with_substring(folder_path, substring):
     # 获取文件夹中所有文件
     all_files = os.listdir(folder_path)
