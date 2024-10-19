@@ -29,32 +29,41 @@ def choose_images_match_samples(images_files, samples_files, config, mode) -> Li
     match_pairs_list = list()
     
     for image_file in choose_images_files:
+        
         match_pairs = {}
         match_pairs[image_file] = list()
         extract_rwa_samples_name = random.sample(samples_files, config["sample_min_nums_at_one_image"])
+        
         for sample_file in extract_rwa_samples_name:
+            
             search_path = os.path.join(config["samples_path"], sample_file.split("_")[0])
-            all_files = os.listdir(search_path)
-            matching_images = [file for file in all_files if file.startswith(sample_file)]
-            if random.random() < config["rotation_prob"]:
-                images_with_r = [image for image in matching_images if 'r' in image]
-                if images_with_r:
-                    match_pairs[image_file].append(random.choice(images_with_r))
-            if random.random() < config["up_prob"]:
-                images_with_u = [image for image in matching_images if 'u' in image]
-                if images_with_u:
-                    match_pairs[image_file].append(random.choice(images_with_u))
-            if random.random() < config["down_prob"]:
-                images_with_d = [image for image in matching_images if 'd' in image]
-                if images_with_d:
-                    match_pairs[image_file].append(random.choice(images_with_d))
-            if random.random() < config["light_prob"]:
-                images_with_l = [image for image in matching_images if 'l' in image]
-                if images_with_l:
-                    match_pairs[image_file].append(random.choice(images_with_l))
-            found = any(sample_file in image for image in match_pairs[image_file])
-            if not found:
-                match_pairs[image_file].append(random.choice(matching_images))
+            
+            # 如果当前样本文件不在不需要融合的样本文件列表中
+            if os.path.basename(search_path) not in config["without_need_aug_sample_class"]:
+                all_files = os.listdir(search_path)
+                matching_images = [file for file in all_files if file.startswith(sample_file)]
+                if random.random() < config["rotation_prob"]:
+                    images_with_r = [image for image in matching_images if 'r' in image]
+                    if images_with_r:
+                        match_pairs[image_file].append(random.choice(images_with_r))
+                if random.random() < config["up_prob"]:
+                    images_with_u = [image for image in matching_images if 'u' in image]
+                    if images_with_u:
+                        match_pairs[image_file].append(random.choice(images_with_u))
+                if random.random() < config["down_prob"]:
+                    images_with_d = [image for image in matching_images if 'd' in image]
+                    if images_with_d:
+                        match_pairs[image_file].append(random.choice(images_with_d))
+                if random.random() < config["light_prob"]:
+                    images_with_l = [image for image in matching_images if 'l' in image]
+                    if images_with_l:
+                        match_pairs[image_file].append(random.choice(images_with_l))
+                found = any(sample_file in image for image in match_pairs[image_file])
+                if not found:
+                    match_pairs[image_file].append(random.choice(matching_images))
+            
+            else:
+                match_pairs[image_file].append(sample_file+"_none.png")
         match_pairs_list.append(match_pairs)
 
     return match_pairs_list
