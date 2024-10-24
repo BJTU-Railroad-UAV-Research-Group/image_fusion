@@ -110,7 +110,7 @@ def process(config):
         os.makedirs(dst_dir, exist_ok=True)
         [shutil.copy(os.path.join(src_dir, file), dst_dir) for file in os.listdir(src_dir) if train_sample in file]
      
-    #将划分出的抠图样本的训练集移动到CuttedObject_path/{抠图类别}/val  
+    #将划分出的抠图样本的验证集移动到CuttedObject_path/{抠图类别}/val  
     for val_sample in val_samples:
         dst_dir = os.path.join(CuttedObject_path, val_sample.split("_")[0], "val")
         src_dir = os.path.join(config["samples_path"], val_sample.split("_")[0])
