@@ -15,11 +15,13 @@ def process(config):
     
     FilteredLabeled_path = os.path.join(config["output_path"], "FilteredLabeled")
     Augmented_path = os.path.join(config["output_path"], "Augmented")
+    CuttedObject_path = os.path.join(config["output_path"], "CuttedObject")
     
     os.makedirs(os.path.join(FilteredLabeled_path, "train"), exist_ok=True)
     os.makedirs(os.path.join(FilteredLabeled_path, "val"), exist_ok=True)
     os.makedirs(os.path.join(Augmented_path, "train"), exist_ok=True)
     os.makedirs(os.path.join(Augmented_path, "val"), exist_ok=True)
+    os.makedirs(CuttedObject_path, exist_ok=True)
     
     train_files, val_files = split_raw_image_dataset(config["ori_img_path"], config["train_ratio"], seed=config["seed"])
     
@@ -91,14 +93,29 @@ def process(config):
             json_file.close()
         # print(f"Val File: Saved {fused_label_name} to {Augmented_path}")
     
+    #将划分出的原始图像的训练集移动到FilteredLabeled_path/train
     for train_file in train_files:
         shutil.copy(os.path.join(config["ori_img_path"], train_file), os.path.join(FilteredLabeled_path, "train", train_file))
         shutil.copy(os.path.join(config["ori_img_path"], train_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "train", train_file.split(".")[0]+".json"))
     
+    #将划分出的原始图像的验证集移动到FilteredLabeled_path/val
     for val_file in val_files:
         shutil.copy(os.path.join(config["ori_img_path"], val_file), os.path.join(FilteredLabeled_path, "val", val_file))
         shutil.copy(os.path.join(config["ori_img_path"], val_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "val", val_file.split(".")[0]+".json"))
     
+    #将划分出的抠图样本的训练集移动到CuttedObject_path/{抠图类别}/train  
+    for train_sample in train_samples:
+        dst_dir = os.path.join(CuttedObject_path, train_sample.split("_")[0], "train")
+        src_dir = os.path.join(config["samples_path"], train_sample.split("_")[0])
+        os.makedirs(dst_dir, exist_ok=True)
+        [shutil.copy(os.path.join(src_dir, file), dst_dir) for file in os.listdir(src_dir) if train_sample in file]
+     
+    #将划分出的抠图样本的训练集移动到CuttedObject_path/{抠图类别}/val  
+    for val_sample in val_samples:
+        dst_dir = os.path.join(CuttedObject_path, val_sample.split("_")[0], "val")
+        src_dir = os.path.join(config["samples_path"], val_sample.split("_")[0])
+        os.makedirs(dst_dir, exist_ok=True)
+        [shutil.copy(os.path.join(src_dir, file), dst_dir) for file in os.listdir(src_dir) if val_sample in file]
 
 if __name__ == "__main__":
     
