@@ -122,8 +122,4 @@ if __name__ == "__main__":
     with open('config/config.yml', 'r', encoding="utf-8") as file:
             user_config = yaml.safe_load(file)
     
-    train_files, val_files = split_raw_image_dataset(user_config["ori_img_path"], user_config["train_ratio"], seed=user_config["seed"])
-    
-    train_samples, val_samples = extract_unique_samples(user_config["samples_path"], user_config["train_ratio"], seed=user_config["seed"])
-    
     process(config=user_config)
