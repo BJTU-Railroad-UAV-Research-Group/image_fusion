@@ -7,12 +7,12 @@ ori_img_path: "images" # 原图路径，默认存放原图的文件夹名称
 train_aug_pairs_name: "train_aug_pairs.csv" # 训练集增强样本对列表，默认训练集增强样本对列表名称
 val_aug_pairs_name: "val_aug_pairs.csv" # 测试集增强样本对列表，默认测试集增强样本对列表名称
 
-train_fusion_image_nums: 2 # 要生成的融合图像的数量
+train_fusion_image_nums: 30 # 要生成的融合图像的数量
 sample_min_nums_at_one_image: 1 # 选择要融入原始图像的抠图样本数量，不要设置过大，1或2即可，会自动进行选定抠图样本的随机增强
 
 without_need_aug_sample_class: [] # 不需要增强的样本类别名称，默认为空，如果需要，请将样本类别名称（例如["异常堆载"、"异常减载"]）添加到列表中，程序处理时对这类样本不会进行增强操作（即使下面使用了概率值设置）
 
-train_ratio: 0.7 # 训练集比例，默认0.7
+train_ratio: 0.8 # 训练集比例，默认0.7
 rotation_prob: 0.5 # 旋转概率，默认0.5
 up_prob: 0.5 # 放大概率，默认0.5
 down_prob: 0.5 # 缩小概率，默认0.5

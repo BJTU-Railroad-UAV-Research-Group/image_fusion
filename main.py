@@ -79,7 +79,7 @@ def process(config):
         val_image_path = os.path.join(config["ori_img_path"], val_image_file)
         sample_images_path = [os.path.join(config["samples_path"], sample_file.split("_")[0], sample_file) for sample_file in sample_files]
 
-        fused_image, fused_label = paste_samples_on_image(image_path=val_image_path,sample_images_path=sample_images_path, config=config)
+        fused_image, fused_label = paste_samples_on_image(image_path=val_image_path,sample_images_path=sample_images_path)
         fused_label["imagePath"] = fused_image_name
         
         # 过滤掉类别为__mask__的目标
