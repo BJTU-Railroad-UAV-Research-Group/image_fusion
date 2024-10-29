@@ -6,7 +6,7 @@ import shutil
 
 from tqdm import tqdm
 
-from utils.utils import count_images_with_substring, write_image_info_to_csv
+from utils.utils import count_images_with_substring, write_image_info_to_csv, remove_mask_annotations
 from utils.fusion import choose_images_match_samples, paste_samples_on_image
 from utils.dataset import split_raw_image_dataset, extract_unique_samples
 
@@ -96,12 +96,12 @@ def process(config):
     #将划分出的原始图像的训练集移动到FilteredLabeled_path/train
     for train_file in train_files:
         shutil.copy(os.path.join(config["ori_img_path"], train_file), os.path.join(FilteredLabeled_path, "train", train_file))
-        shutil.copy(os.path.join(config["ori_img_path"], train_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "train", train_file.split(".")[0]+".json"))
+        remove_mask_annotations(os.path.join(config["ori_img_path"], train_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "train", train_file.split(".")[0]+".json"))
     
     #将划分出的原始图像的验证集移动到FilteredLabeled_path/val
     for val_file in val_files:
         shutil.copy(os.path.join(config["ori_img_path"], val_file), os.path.join(FilteredLabeled_path, "val", val_file))
-        shutil.copy(os.path.join(config["ori_img_path"], val_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "val", val_file.split(".")[0]+".json"))
+        remove_mask_annotations(os.path.join(config["ori_img_path"], val_file.split(".")[0]+".json"), os.path.join(FilteredLabeled_path, "val", val_file.split(".")[0]+".json"))
     
     #将划分出的抠图样本的训练集移动到CuttedObject_path/{抠图类别}/train  
     for train_sample in train_samples:

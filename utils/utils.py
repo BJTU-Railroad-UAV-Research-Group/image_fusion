@@ -46,3 +46,18 @@ def write_image_info_to_csv(image_info_list, output_csv):
 
                 # 写入CSV文件行
                 writer.writerow([enhanced_image_name, sample_count, sample_file_names, enhancement_methods])
+
+def remove_mask_annotations(input_json_path, output_json_path):
+    # 读取原始的json文件
+    with open(input_json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    # 保留不为'__mask__'的标注
+    filtered_shapes = [shape for shape in data['shapes'] if shape['label'] != '__mask__']
+    
+    # 更新数据中的shapes部分
+    data['shapes'] = filtered_shapes
+    
+    # 将新的数据写入到新的json文件
+    with open(output_json_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
