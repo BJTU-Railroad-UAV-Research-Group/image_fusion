@@ -5,6 +5,7 @@ import os
 import shutil
 
 from tqdm import tqdm
+from time import time
 
 from utils.utils import count_images_with_substring, write_image_info_to_csv, remove_mask_annotations
 from utils.fusion import choose_images_match_samples, paste_samples_on_image
@@ -50,8 +51,12 @@ def process(config):
         
         train_image_path = os.path.join(config["ori_img_path"], train_image_file)
         sample_images_path = [os.path.join(config["samples_path"], sample_file.split("_")[0], sample_file) for sample_file in sample_files]
-    
+        start_time = time()
         fused_image, fused_label = paste_samples_on_image(image_path=train_image_path, sample_images_path=sample_images_path)
+        if time() - start_time > config["time_limit"]:
+            print("Time limit exceeded, skipping this image.")
+            continue
+        
         fused_label["imagePath"] = fused_image_name
         
         # 过滤掉类别为__mask__的目标
@@ -78,8 +83,12 @@ def process(config):
 
         val_image_path = os.path.join(config["ori_img_path"], val_image_file)
         sample_images_path = [os.path.join(config["samples_path"], sample_file.split("_")[0], sample_file) for sample_file in sample_files]
-
+        start_time = time()
         fused_image, fused_label = paste_samples_on_image(image_path=val_image_path,sample_images_path=sample_images_path)
+        if time() - start_time > config["time_limit"]:
+            print("Time limit exceeded, skipping this image.")
+            continue
+        
         fused_label["imagePath"] = fused_image_name
         
         # 过滤掉类别为__mask__的目标
