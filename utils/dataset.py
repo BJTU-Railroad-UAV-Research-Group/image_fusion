@@ -13,7 +13,7 @@ def split_raw_image_dataset(image_folder: str, train_ratio: float, seed: int = N
     :return: 返回一个包含训练集和验证集文件名的元组 (train_files, val_files)
     """
     # 支持的图片文件扩展名
-    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', ".JPG"}
+    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', ".JPG", ".JPEG"}
 
     # 获取文件夹下的所有图片文件名，不含有mask图像
     image_files = [f for f in os.listdir(image_folder)
@@ -48,7 +48,7 @@ def extract_unique_samples(base_folder: str, train_ratio: float, seed: int = Non
     for root, _, files in os.walk(base_folder):
         for file_name in files:
             # 只处理图片文件
-            if file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
+            if file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', ".JPG", ".JPEG")):
                 # 提取文件名中的 "样本类别名称_序号" 部分
                 base_name = os.path.splitext(file_name)[0]  # 去掉文件扩展名
                 unique_id = "_".join(base_name.split('_')[:2])  # 提取 "样本类别名称_序号"
